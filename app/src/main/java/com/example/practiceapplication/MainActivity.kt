@@ -1,10 +1,12 @@
 package com.example.practiceapplication
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.practiceapplication.data.BlogType
 import com.example.practiceapplication.data.Person
 import com.example.practiceapplication.data.RssTile
 import com.example.practiceapplication.ui.theme.PracticeApplicationTheme
@@ -44,10 +49,32 @@ class MainActivity : ComponentActivity() {
 
         val rsItems = listOf(
             RssTile(
-                "Welcome to android development",
+                "Yay, my first android application...",
                 "Android development is not as bad as i thought, naa, for real, its actually not a bad stack if you deep it and go deep, i mean in a way  shaaaaaa.",
-                "Post"
-            )
+                BlogType.TEXT
+            ),
+            RssTile(
+                "Is this better than twitter ???",
+                "Android development is not as bad as i thought, naa, for real, its actually not a bad stack if you deep it and go deep, i mean in a way  shaaaaaa.",
+                BlogType.TEXT
+            ),
+            RssTile(
+                "Yay, watch me dance",
+                "Android development is not as bad as i thought, naa, for real, its actually not a bad stack if you deep it and go deep, i mean in a way  shaaaaaa.",
+                BlogType.VIDEO,
+                R.drawable.video_thumbnail
+            ),
+            RssTile(
+                "I just uploaded a dance video, watch me twirl y'all.",
+                "Android development is not as bad as i thought, naa, for real, its actually not a bad stack if you deep it and go deep, i mean in a way  shaaaaaa.",
+                BlogType.TEXT
+            ),
+            RssTile(
+                "I look good, don't i.",
+                "Android development is not as bad as i thought, naa, for real, its actually not a bad stack if you deep it and go deep, i mean in a way  shaaaaaa.",
+                BlogType.Photo,
+                R.drawable.parrot
+            ),
         )
         setContent {
             PracticeApplicationTheme {
@@ -58,8 +85,15 @@ class MainActivity : ComponentActivity() {
                     )
 
                     LazyColumn {
-                        items(people) {
-                            CardView(it)
+//                        items(people) {
+//                            CardView(it) // Used this for default card view, like a container in react native. orr a view with card Tendencies.
+//                        }
+                        items(rsItems) {
+                            when (it.type) {
+                                BlogType.TEXT -> BlogViewText(it)
+                                BlogType.VIDEO -> BlogViewVideo(it)
+                                BlogType.Photo -> BlogViewPhoto(it)
+                            }
                         }
 
                     }
@@ -68,6 +102,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
@@ -121,4 +156,84 @@ fun CardView(person: Person) {
 }
 
 @Composable
-fun BlogView(rssItem: RssTile){}
+fun BlogViewText(rssItem: RssTile) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+    ) {
+        Text(
+            text = rssItem.title,
+            modifier = Modifier.padding(12.dp),
+            fontSize = 32.sp,
+            lineHeight = 32.sp,
+            fontWeight = FontWeight.Black
+        )
+
+        Text(
+            text = rssItem.content,
+            modifier = Modifier.padding(12.dp),
+            fontSize = 14.sp,
+            lineHeight = 14.sp,
+            fontWeight = FontWeight.Black
+        )
+    }
+}
+
+@Composable
+fun BlogViewVideo(rssItem: RssTile) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+
+    ) {
+        Text(
+            text = rssItem.title,
+            modifier = Modifier.padding(12.dp),
+            fontSize = 30.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        rssItem.mediaSrc?.let {
+            Image(
+                painter = painterResource(id = it),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        Log.d("Image component","Random pressed")
+                    }
+                ,
+                contentDescription = "Photo of a person"
+            )
+        }
+
+
+    }
+}
+
+
+@Composable
+fun BlogViewPhoto(it: RssTile) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+    ) {
+
+        it.mediaSrc?.let { photo ->
+            Image(
+                painter = painterResource(id = photo),
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentDescription = "Photo of a person"
+            )
+        }
+        Text(
+            text = it.title,
+            modifier = Modifier.padding(10.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
